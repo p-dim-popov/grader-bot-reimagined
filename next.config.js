@@ -4,6 +4,15 @@ module.exports = {
     dirs: ['src'],
   },
 
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'http://localhost:5228/:path*'
+      }
+    ]
+  },
+
   reactStrictMode: true,
 
   // Uncoment to add domain whitelist
