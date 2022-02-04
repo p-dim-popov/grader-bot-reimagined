@@ -2,11 +2,20 @@ import { Context, createWrapper, HYDRATE, MakeStore } from 'next-redux-wrapper';
 import { AnyAction, createStore, Store } from 'redux';
 
 import { AuthUser } from '@/models/AuthUser';
-import { ISetAuthUserAction, SetAuthUserAction } from '@/redux/actions';
+import { ProblemTypeDescription } from '@/models/ProblemTypeDescription';
+import {
+  ISetAuthUserAction,
+  ISetMostRecentProblemAction,
+  SetAuthUserAction,
+  SetMostRecentProblemAction,
+} from '@/redux/actions';
 
 export interface AppState {
   auth: {
     user: AuthUser | null;
+  };
+  common: {
+    mostRecentProblem: ProblemTypeDescription;
   };
 }
 
@@ -14,9 +23,15 @@ const initialState: AppState = {
   auth: {
     user: null,
   },
+  common: {
+    mostRecentProblem: null as any,
+  },
 };
 
-type AppAction = ISetAuthUserAction | { type: typeof HYDRATE; payload: any };
+type AppAction =
+  | ISetAuthUserAction
+  | ISetMostRecentProblemAction
+  | { type: typeof HYDRATE; payload: AppState };
 
 const reducer = (state: AppState = initialState, action: AppAction) => {
   switch (action.type) {
@@ -25,6 +40,11 @@ const reducer = (state: AppState = initialState, action: AppAction) => {
         ...state,
         // server-side auth is always correct
         auth: action.payload.auth,
+        common: {
+          ...state,
+          // for now this is set only server side
+          mostRecentProblem: action.payload.common.mostRecentProblem,
+        },
       };
     case SetAuthUserAction.type:
       return {
@@ -32,6 +52,14 @@ const reducer = (state: AppState = initialState, action: AppAction) => {
         auth: {
           ...state.auth,
           user: action.payload,
+        },
+      };
+    case SetMostRecentProblemAction.type:
+      return {
+        ...state,
+        common: {
+          ...state.common,
+          mostRecentProblem: action.payload,
         },
       };
     default:

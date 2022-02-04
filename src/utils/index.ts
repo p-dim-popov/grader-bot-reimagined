@@ -2,6 +2,7 @@ import Axios, { AxiosRequestConfig } from 'axios';
 import { serialize as serializeCookie } from 'cookie';
 import jwt from 'jsonwebtoken';
 
+import { Cookie } from '@/constants';
 import { clientAxios } from '@/utils/client-side';
 import { defaultAxiosServerConfig, serverAxios } from '@/utils/server-side';
 
@@ -41,6 +42,13 @@ interface JwtContent {
   exp: number;
   iat: number;
 }
+
+export const clearAuthCookie = (res: any): void => {
+  setCookie(res, Cookie.Jwt, '0', {
+    ...getDefaultCookieOptions(),
+    maxAge: -1,
+  });
+};
 
 export const getDefaultCookieOptions = (
   overrides: Record<string, unknown> = {}
