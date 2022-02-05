@@ -15,6 +15,7 @@ import {
     getAxios,
     getDecodedJwt,
     getDefaultCookieOptions,
+    runCatchingAsync,
     setCookie,
 } from "@/utils";
 
@@ -39,12 +40,12 @@ const WrappedApp = wrapper.withRedux((({ Component, pageProps }) => {
     );
 }) as React.FC<AppProps<IAppProps>>);
 
-WrappedApp.getInitialProps = wrapper.getInitialAppProps(
+WrappedApp.getInitialProps = wrapper.getInitialAppProps<IAppProps>(
     (store) => async (context) => {
         console.log("_app/getInitialProps");
         const ctx = context.ctx;
-        const initialPageProps = await App.getInitialProps(context).then(
-            (x) => x.pageProps
+        const [initialPageProps = {}] = await runCatchingAsync(() =>
+            App.getInitialProps(context).then((x) => x.pageProps)
         );
 
         if (typeof window !== "undefined") {
@@ -56,16 +57,16 @@ WrappedApp.getInitialProps = wrapper.getInitialAppProps(
             };
         }
 
-        const jwt = (ctx.req as any).cookies.access_token;
+        const jwt = (ctx.req as any).cookies.access_token as string;
 
         const tokenData = getDecodedJwt(jwt);
         getAxios().defaults.headers.common["Authorization"] = `Bearer ${jwt}`;
 
         clearAuthCookie(ctx.res);
         if (tokenData) {
-            try {
-                const user = await fetchUser();
+            const [user] = await runCatchingAsync(fetchUser);
 
+            if (user) {
                 store.dispatch(SetAuthUserAction.create(user));
                 setCookie(
                     ctx.res,
@@ -75,8 +76,6 @@ WrappedApp.getInitialProps = wrapper.getInitialAppProps(
                         maxAge: tokenData.exp - Date.now() / 1000,
                     })
                 );
-            } catch (e) {
-                console.error(e);
             }
         }
 

@@ -1,6 +1,6 @@
 import Axios, { AxiosRequestConfig } from "axios";
 import { serialize as serializeCookie } from "cookie";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 import { Cookie } from "@/constants";
 import { clientAxios } from "@/utils/client-side";
@@ -36,7 +36,7 @@ export function setCookie(
     );
 }
 
-interface JwtContent {
+interface JwtContent extends JwtPayload {
     id: string;
     jti: string;
     role: string;
@@ -68,25 +68,33 @@ export function getDecodedJwt(
 ): JwtContent | null {
     if (!token) return null;
 
-    try {
-        const data = jwt.decode(token);
+    const [data, error] = runCatching(() => jwt.decode(token));
 
-        if (!data) return null;
+    if (!data || error) return null;
 
-        return data as JwtContent;
-    } catch (error) {
-        return null;
-    }
+    return data as JwtContent;
 }
+
+export type IResult<TResult> =
+    | [result: TResult, error: undefined]
+    | [result: undefined, error: unknown];
 
 export const runCatchingAsync = async <TResult>(
     func: () => Promise<TResult>
-): Promise<[result: TResult, error: null] | [result: null, error: unknown]> => {
+): Promise<IResult<TResult>> => {
     try {
         const result = await func();
+        return [result, undefined];
+    } catch (error) {
+        return [undefined, error];
+    }
+};
 
-        return [result, null];
-    } catch (e) {
-        return [null, e];
+export const runCatching = <TResult>(func: () => TResult): IResult<TResult> => {
+    try {
+        const result = func();
+        return [result, undefined];
+    } catch (error) {
+        return [undefined, error];
     }
 };

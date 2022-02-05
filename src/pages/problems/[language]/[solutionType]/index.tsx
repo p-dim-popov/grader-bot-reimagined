@@ -46,7 +46,7 @@ export const getServerSideProps =
                 )
             );
 
-            if (problems !== null) {
+            if (problems) {
                 return {
                     props: {
                         list: problems,
