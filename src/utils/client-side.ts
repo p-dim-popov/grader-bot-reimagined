@@ -1,7 +1,7 @@
-import Axios, { AxiosRequestConfig } from 'axios';
+import Axios, { AxiosRequestConfig } from "axios";
 
 export const defaultAxiosClientConfig: AxiosRequestConfig = {
-  baseURL: '/api',
+    baseURL: "/api",
 };
 
 export const clientAxios = Axios.create(defaultAxiosClientConfig);

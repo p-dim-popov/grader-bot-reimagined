@@ -1,64 +1,96 @@
-import axios from 'axios';
-import { AppProps } from 'next/app';
-import React from 'react';
+import App, { AppProps } from "next/app";
+import React, { useEffect } from "react";
 
-import '@/styles/globals.css';
+import "@/styles/globals.css";
 
-import AppLayout from '@/components/layout/AppLayout';
+import AppLayout from "@/components/layout/AppLayout";
 
-import { Cookie } from '@/constants';
-import { SetAuthUserAction } from '@/redux/actions';
-import { wrapper } from '@/redux/store';
-import { fetchUser } from '@/services/users.service';
-import { getDecodedJwt, getDefaultCookieOptions, setCookie } from '@/utils';
+import { Cookie } from "@/constants";
+import { SetAuthUserAction, SetMostRecentProblemAction } from "@/redux/actions";
+import { wrapper } from "@/redux/store";
+import { fetchMostRecentProblemType } from "@/services/problems.service";
+import { fetchUser } from "@/services/users.service";
+import {
+    clearAuthCookie,
+    getAxios,
+    getDecodedJwt,
+    getDefaultCookieOptions,
+    setCookie,
+} from "@/utils";
 
-axios.defaults.baseURL = '/api';
+interface IAppProps {
+    lastRanInBrowser: boolean;
+    jwt: string;
+}
 
-const WrappedApp: React.FC<AppProps> = ({ Component, pageProps }) => {
-  return (
-    <AppLayout>
-      <Component {...pageProps} />
-    </AppLayout>
-  );
-};
+const WrappedApp = wrapper.withRedux((({ Component, pageProps }) => {
+    useEffect(() => {
+        if (!pageProps.lastRanInBrowser) {
+            const axios = getAxios();
+            axios.defaults.headers.common[
+                "Authorization"
+            ] = `Bearer ${pageProps.jwt}`;
+        }
+    }, [pageProps.jwt, pageProps.lastRanInBrowser]);
+    return (
+        <AppLayout>
+            <Component {...pageProps} />
+        </AppLayout>
+    );
+}) as React.FC<AppProps<IAppProps>>);
 
-(WrappedApp as any).getInitialProps = wrapper.getInitialPageProps(
-  (store) => async (ctx) => {
-    const context = (ctx as any).ctx;
-
-    console.debug('_app/getInitialProps');
-
-    if (typeof window !== 'undefined') {
-      return { lastRanInBrowser: true };
-    }
-
-    const clearAuthCookie = (): void => {
-      setCookie(context.res, Cookie.Jwt, '0', {
-        ...getDefaultCookieOptions(),
-        maxAge: -1,
-      });
-    };
-
-    const tokenData = getDecodedJwt(context.req.cookies.access_token);
-    clearAuthCookie();
-    if (tokenData) {
-      try {
-        const user = await fetchUser(context.req.cookies.access_token)();
-
-        store.dispatch(SetAuthUserAction.create(user));
-        setCookie(
-          context.res,
-          Cookie.Jwt,
-          context.req.cookies.access_token,
-          getDefaultCookieOptions({ maxAge: tokenData.exp - Date.now() / 1000 })
+WrappedApp.getInitialProps = wrapper.getInitialAppProps(
+    (store) => async (context) => {
+        console.log("_app/getInitialProps");
+        const ctx = context.ctx;
+        const initialPageProps = await App.getInitialProps(context).then(
+            (x) => x.pageProps
         );
-      } catch (e) {
-        console.error(e);
-      }
-    }
 
-    return { lastRanInBrowser: false };
-  }
+        if (typeof window !== "undefined") {
+            return {
+                pageProps: {
+                    ...initialPageProps,
+                    lastRanInBrowser: true,
+                },
+            };
+        }
+
+        const jwt = (ctx.req as any).cookies.access_token;
+
+        const tokenData = getDecodedJwt(jwt);
+        getAxios().defaults.headers.common["Authorization"] = `Bearer ${jwt}`;
+
+        clearAuthCookie(ctx.res);
+        if (tokenData) {
+            try {
+                const user = await fetchUser();
+
+                store.dispatch(SetAuthUserAction.create(user));
+                setCookie(
+                    ctx.res,
+                    Cookie.Jwt,
+                    jwt,
+                    getDefaultCookieOptions({
+                        maxAge: tokenData.exp - Date.now() / 1000,
+                    })
+                );
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        const mostRecentProblem = await fetchMostRecentProblemType();
+        store.dispatch(SetMostRecentProblemAction.create(mostRecentProblem));
+
+        return {
+            pageProps: {
+                ...initialPageProps,
+                lastRanInBrowser: false,
+                jwt,
+            },
+        };
+    }
 );
 
-export default wrapper.withRedux(WrappedApp);
+export default WrappedApp;

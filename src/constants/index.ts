@@ -1,7 +1,7 @@
 export const Storage = {
-  Jwt: 'Jwt',
+    Jwt: "Jwt",
 };
 
 export const Cookie = {
-  Jwt: 'access_token',
+    Jwt: "access_token",
 };

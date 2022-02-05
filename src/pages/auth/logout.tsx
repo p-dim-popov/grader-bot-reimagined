@@ -1,22 +1,24 @@
-import { useRouter } from 'next/router';
-import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import React from "react";
 
-import { Storage } from '@/constants';
-import { SetAuthUserAction } from '@/redux/actions';
+import { SetAuthUserAction } from "@/redux/actions";
+import { wrapper } from "@/redux/store";
+import { clearAuthCookie } from "@/utils";
 
-const Logout: React.FC = () => {
-  const router = useRouter();
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    sessionStorage.removeItem(Storage.Jwt);
-    localStorage.removeItem(Storage.Jwt);
-    dispatch(SetAuthUserAction.create());
-    router.push('/');
-  }, []);
-
-  return <></>;
-};
+const Logout: React.FC = () => <></>;
 
 export default Logout;
+
+export const getServerSideProps = wrapper.getServerSideProps(
+    (store) =>
+        async ({ req, res }) => {
+            clearAuthCookie(res);
+            store.dispatch(SetAuthUserAction.create());
+
+            return {
+                redirect: {
+                    destination: "/",
+                },
+                props: {},
+            };
+        }
+);

@@ -1,70 +1,80 @@
-import Axios, { AxiosRequestConfig } from 'axios';
-import { serialize as serializeCookie } from 'cookie';
-import jwt from 'jsonwebtoken';
+import Axios, { AxiosRequestConfig } from "axios";
+import { serialize as serializeCookie } from "cookie";
+import jwt from "jsonwebtoken";
 
-import { clientAxios } from '@/utils/client-side';
-import { defaultAxiosServerConfig, serverAxios } from '@/utils/server-side';
+import { Cookie } from "@/constants";
+import { clientAxios } from "@/utils/client-side";
+import { defaultAxiosServerConfig, serverAxios } from "@/utils/server-side";
 
 export const getAxios = (config?: AxiosRequestConfig) => {
-  const isServer = typeof window === 'undefined';
+    const isServer = typeof window === "undefined";
 
-  if (!config) {
-    return isServer ? serverAxios : clientAxios;
-  }
+    if (!config) {
+        return isServer ? serverAxios : clientAxios;
+    }
 
-  return Axios.create({
-    ...(isServer ? defaultAxiosServerConfig : defaultAxiosServerConfig),
-    ...config,
-  });
+    return Axios.create({
+        ...(isServer ? defaultAxiosServerConfig : defaultAxiosServerConfig),
+        ...config,
+    });
 };
 
 export function setCookie(
-  res: any,
-  name: string,
-  value: string,
-  options: Record<string, unknown> = {}
+    res: any,
+    name: string,
+    value: string,
+    options: Record<string, unknown> = {}
 ): void {
-  const stringValue =
-    typeof value === 'object' ? `j:${JSON.stringify(value)}` : String(value);
+    const stringValue =
+        typeof value === "object"
+            ? `j:${JSON.stringify(value)}`
+            : String(value);
 
-  res.setHeader(
-    'Set-Cookie',
-    serializeCookie(name, String(stringValue), options)
-  );
+    res.setHeader(
+        "Set-Cookie",
+        serializeCookie(name, String(stringValue), options)
+    );
 }
 
 interface JwtContent {
-  id: string;
-  jti: string;
-  role: string;
-  nbf: number;
-  exp: number;
-  iat: number;
+    id: string;
+    jti: string;
+    role: string;
+    nbf: number;
+    exp: number;
+    iat: number;
 }
 
+export const clearAuthCookie = (res: any): void => {
+    setCookie(res, Cookie.Jwt, "0", {
+        ...getDefaultCookieOptions(),
+        maxAge: -1,
+    });
+};
+
 export const getDefaultCookieOptions = (
-  overrides: Record<string, unknown> = {}
+    overrides: Record<string, unknown> = {}
 ) => ({
-  httpOnly: true,
-  path: '/',
-  sameSite: 'Strict',
-  secure: process.env.NODE_ENV === 'production',
-  maxAge: 2592000,
-  ...overrides,
+    httpOnly: true,
+    path: "/",
+    sameSite: "Strict",
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 2592000,
+    ...overrides,
 });
 
 export function getDecodedJwt(
-  token: string | null | undefined
+    token: string | null | undefined
 ): JwtContent | null {
-  if (!token) return null;
+    if (!token) return null;
 
-  try {
-    const data = jwt.decode(token);
+    try {
+        const data = jwt.decode(token);
 
-    if (!data) return null;
+        if (!data) return null;
 
-    return data as JwtContent;
-  } catch (error) {
-    return null;
-  }
+        return data as JwtContent;
+    } catch (error) {
+        return null;
+    }
 }
