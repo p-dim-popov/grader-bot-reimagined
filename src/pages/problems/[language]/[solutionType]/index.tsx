@@ -46,8 +46,15 @@ export const getServerSideProps =
                 )
             );
 
+            if (problems !== null) {
+                return {
+                    props: {
+                        list: problems,
+                    },
+                };
+            }
+
             if (Axios.isAxiosError(error)) {
-                // TODO: check status code
                 return {
                     redirect: {
                         destination: "/404",
@@ -58,7 +65,7 @@ export const getServerSideProps =
 
             return {
                 props: {
-                    list: problems,
+                    list: [],
                 },
             };
         }

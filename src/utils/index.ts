@@ -81,13 +81,12 @@ export function getDecodedJwt(
 
 export const runCatchingAsync = async <TResult>(
     func: () => Promise<TResult>
-): Promise<[result: TResult, error?: unknown]> => {
+): Promise<[result: TResult, error: null] | [result: null, error: unknown]> => {
     try {
         const result = await func();
 
-        return [result];
+        return [result, null];
     } catch (e) {
-        // TODO: think of something...
-        return [undefined!, e];
+        return [null, e];
     }
 };
