@@ -78,3 +78,16 @@ export function getDecodedJwt(
         return null;
     }
 }
+
+export const runCatchingAsync = async <TResult>(
+    func: () => Promise<TResult>
+): Promise<[result: TResult, error?: unknown]> => {
+    try {
+        const result = await func();
+
+        return [result];
+    } catch (e) {
+        // TODO: think of something...
+        return [undefined!, e];
+    }
+};
