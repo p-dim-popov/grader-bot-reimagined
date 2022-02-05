@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import * as React from "react";
 
 import Hideable from "@/components/Hideable";
@@ -27,6 +28,7 @@ const Divider: React.FC = () => <span>|</span>;
 export default function Header() {
     const isLoggedIn = useAppSelector(getIsLoggedIn);
     const mostRecentProblem = useAppSelector((x) => x.problems.mostRecent);
+    const router = useRouter();
 
     return (
         <header className="sticky top-0 z-50 w-full bg-white">
@@ -62,7 +64,12 @@ export default function Header() {
                                 href="/auth/register"
                             />
                             <Divider />
-                            <ListItemLink label="Login" href="/auth/login" />
+                            <ListItemLink
+                                label="Login"
+                                href={`/auth/login?backTo=${encodeURIComponent(
+                                    router.asPath
+                                )}`}
+                            />
                             <Divider />
                         </Hideable>
                         <Hideable isVisible={isLoggedIn}>

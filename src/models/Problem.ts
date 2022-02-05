@@ -3,5 +3,5 @@ export interface Problem {
     title: string;
     description: string;
     type: number;
-    author: string;
+    authorEmail: string;
 }

@@ -15,14 +15,18 @@ const Login = () => {
         password: string;
     } | null>(null);
     const router = useRouter();
-    const goToHome = useCallback(() => router.push("/"), [router]);
+    const backTo = router.query.backTo as string;
+    const goBackOrHome = useCallback(
+        () => router.push(backTo ?? "/"),
+        [backTo, router]
+    );
     const isLoggedIn = useAppSelector(getIsLoggedIn);
 
     useEffect(() => {
         if (isLoggedIn) {
-            goToHome();
+            goBackOrHome();
         }
-    }, [isLoggedIn, goToHome]);
+    }, [isLoggedIn, goBackOrHome]);
 
     useEffect(() => {
         if (formData) {
@@ -31,13 +35,13 @@ const Login = () => {
                 .then(
                     (res) => {
                         window.document.cookie += `access_token=${res.data.token};Max-Age=10000;Path=/`;
-                        goToHome();
+                        goBackOrHome();
                     },
                     (e) => console.log(e)
                 )
                 .finally(() => setFormData(null));
         }
-    }, [formData, goToHome]);
+    }, [formData, goBackOrHome]);
 
     return (
         <>

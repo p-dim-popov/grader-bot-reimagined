@@ -1,4 +1,5 @@
 import Axios from "axios";
+import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import React from "react";
 
@@ -6,7 +7,6 @@ import Seo from "@/components/Seo";
 import SimpleLinkCard from "@/components/SimpleLinkCard";
 
 import { Problem } from "@/models/Problem";
-import { wrapper } from "@/redux/store";
 import { fetchAllProblemsOfType } from "@/services/problems.service";
 import { runCatchingAsync } from "@/utils";
 
@@ -27,7 +27,7 @@ const ProblemsListingPage: React.FC<IProblemsListingPageProps> = ({ list }) => {
                         href={`/problems/${router.query.language}/${router.query.solutionType}/${x.id}`}
                         title={x.title}
                         description={x.description}
-                        footer={`By: ${x.author}`}
+                        footer={`By: ${x.authorEmail}`}
                     />
                 ))}
             </div>
@@ -36,37 +36,36 @@ const ProblemsListingPage: React.FC<IProblemsListingPageProps> = ({ list }) => {
 };
 export default ProblemsListingPage;
 
-export const getServerSideProps =
-    wrapper.getServerSideProps<IProblemsListingPageProps>(
-        () => async (context) => {
-            const [problems, error] = await runCatchingAsync(() =>
-                fetchAllProblemsOfType(
-                    context.params?.language as string,
-                    context.params?.solutionType as string
-                )
-            );
-
-            if (problems) {
-                return {
-                    props: {
-                        list: problems,
-                    },
-                };
-            }
-
-            if (Axios.isAxiosError(error)) {
-                return {
-                    redirect: {
-                        destination: "/404",
-                    },
-                    props: { list: [] },
-                };
-            }
-
-            return {
-                props: {
-                    list: [],
-                },
-            };
-        }
+export const getServerSideProps: GetServerSideProps<
+    IProblemsListingPageProps
+> = async (context) => {
+    const [problems, error] = await runCatchingAsync(
+        fetchAllProblemsOfType({
+            language: context.params?.language as string,
+            solutionType: context.params?.solutionType as string,
+        })
     );
+
+    if (problems) {
+        return {
+            props: {
+                list: problems,
+            },
+        };
+    }
+
+    if (Axios.isAxiosError(error)) {
+        return {
+            redirect: {
+                destination: "/404",
+            },
+            props: { list: [] },
+        };
+    }
+
+    return {
+        props: {
+            list: [],
+        },
+    };
+};

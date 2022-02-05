@@ -16,7 +16,7 @@ export const getServerSideProps = wrapper.getServerSideProps(
 
             return {
                 redirect: {
-                    destination: "/",
+                    destination: req.headers.referer ?? "/",
                 },
                 props: {},
             };
