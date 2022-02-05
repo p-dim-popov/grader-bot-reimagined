@@ -50,6 +50,12 @@ export default function Header() {
                             />
                             <Divider />
                         </div>
+                        <ListItemLink
+                            label="Problems"
+                            href="/problems/types"
+                            description="All available problem types"
+                        />
+                        <Divider />
                         <Hideable isVisible={!isLoggedIn}>
                             <ListItemLink
                                 label="Register"

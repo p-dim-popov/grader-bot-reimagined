@@ -17,7 +17,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 }
             `}</style>
             <Header />
-            <div className="max-w-1/2 flex h-full w-full flex-col items-center bg-gray-300">
+            <div className="max-w-1/2 flex h-full w-full flex-col items-center bg-gray-300 pt-8">
                 {children}
             </div>
         </div>
