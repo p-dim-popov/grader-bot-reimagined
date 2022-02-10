@@ -4,16 +4,21 @@ import { debounce } from "lodash-es";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import React, { useCallback, useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { toast } from "react-toastify";
 
+import Attempt from "@/components/Attempt";
 import AutoHide from "@/components/AutoHide";
 import CodeEditor from "@/components/CodeEditor";
 import Hideable from "@/components/Hideable";
 import Seo from "@/components/Seo";
 
 import { Problem } from "@/models/Problem";
+import { SolutionAttempt } from "@/models/SolutionAttempt";
 import { useAppSelector } from "@/redux";
-import { getIsLoggedIn } from "@/redux/selectors";
-import { fetchProblemById } from "@/services/problems.service";
+import { SetEditorThemeAction } from "@/redux/actions";
+import { getEditorTheme, getIsLoggedIn } from "@/redux/selectors";
+import { fetchProblemById, submitSolution } from "@/services/problems.service";
 import { runCatchingAsync } from "@/utils";
 
 interface IProblemIdPageProps {
@@ -27,9 +32,8 @@ const ProblemIdPage: React.FC<IProblemIdPageProps> = ({ problem }) => {
     const [saveState, setSaveState] = useState<"initial" | "saving" | "saved">(
         "initial"
     );
-    const [editorTheme, setEditorTheme] = useState<"vs-dark" | "light">(
-        "vs-dark"
-    );
+    const editorTheme = useAppSelector(getEditorTheme);
+    const dispatch = useDispatch();
 
     const localStorageKey = `problem:${router.query.id}`;
 
@@ -61,9 +65,19 @@ const ProblemIdPage: React.FC<IProblemIdPageProps> = ({ problem }) => {
         [debouncedSave]
     );
 
+    const [fragmentedAttempts, setFragmentedAttempts] = useState<
+        {
+            submissionDate: string;
+            attempts: SolutionAttempt[];
+        }[]
+    >([]);
+
     return (
         <>
-            <Seo />
+            <Seo
+                templateTitle={`${problem.title} | ${router.query.language} | ${router.query.solutionType}`}
+                description={problem.description}
+            />
 
             <div className="flex w-full flex-col space-y-4">
                 <h2>{problem.title}</h2>
@@ -76,7 +90,9 @@ const ProblemIdPage: React.FC<IProblemIdPageProps> = ({ problem }) => {
                         <span>Theme: </span>
                         <Select
                             defaultValue={editorTheme}
-                            onChange={setEditorTheme}
+                            onChange={(value) =>
+                                dispatch(SetEditorThemeAction.create(value))
+                            }
                         >
                             <Select.Option value="vs-dark">Dark</Select.Option>
                             <Select.Option value="light">Light</Select.Option>
@@ -100,13 +116,88 @@ const ProblemIdPage: React.FC<IProblemIdPageProps> = ({ problem }) => {
                     defaultValue={defaultValue}
                 />
                 <div className="flex flex-col space-y-4 lg:flex-row lg:justify-between lg:space-y-0">
-                    <Button type="primary">Try</Button>
+                    <Button
+                        type="primary"
+                        onClick={async () => {
+                            const submissionDate = new Date().toLocaleString();
+                            const [attempts, error] = await runCatchingAsync(
+                                submitSolution(
+                                    problem.id,
+                                    window.localStorage.getItem(
+                                        localStorageKey
+                                    ) ?? "",
+                                    false
+                                )
+                            );
+
+                            if (attempts) {
+                                setFragmentedAttempts((prev) => [
+                                    {
+                                        attempts,
+                                        submissionDate,
+                                    },
+                                    ...prev,
+                                ]);
+                            }
+
+                            if (Axios.isAxiosError(error)) {
+                                toast(
+                                    `Something happened. Error: ${
+                                        error.message.length > 100
+                                            ? `${error.message.substring(
+                                                  0,
+                                                  100
+                                              )}...`
+                                            : error.message
+                                    }`
+                                );
+                            }
+                        }}
+                    >
+                        Try
+                    </Button>
                     <Hideable isVisible={isLoggedIn}>
                         <Button type="primary" danger>
                             Submit
                         </Button>
                     </Hideable>
                 </div>
+                <Hideable isVisible={fragmentedAttempts.length}>
+                    <div>
+                        <h3 className="pb-10">Attempts</h3>
+                        <div className="flex flex-col">
+                            {fragmentedAttempts
+                                .map(({ attempts, submissionDate }) => (
+                                    <>
+                                        <h4>{submissionDate}</h4>
+                                        {attempts.map((attempt, i) => (
+                                            <div
+                                                key={i}
+                                                className="flex flex-col space-y-10 pt-10"
+                                            >
+                                                <Attempt
+                                                    attempt={attempt}
+                                                    title={`#${i}`}
+                                                />
+                                            </div>
+                                        ))}
+                                    </>
+                                ))
+                                .reduce(
+                                    (prev, cur, i) => (
+                                        <>
+                                            {prev}
+                                            <Hideable isVisible={i !== 0}>
+                                                <div className="my-10 flex-grow border-t border-gray-400" />
+                                            </Hideable>
+                                            {cur}
+                                        </>
+                                    ),
+                                    <></>
+                                )}
+                        </div>
+                    </div>
+                </Hideable>
             </div>
         </>
     );
