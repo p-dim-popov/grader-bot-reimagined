@@ -4,11 +4,9 @@ import { createStore, Store } from "redux";
 import { AuthUser } from "@/models/AuthUser";
 import { ProblemTypeDescription } from "@/models/ProblemTypeDescription";
 import {
-    ISetAllProblemTypesAction,
-    ISetAuthUserAction,
-    ISetMostRecentProblemAction,
     SetAllProblemTypesAction,
     SetAuthUserAction,
+    SetEditorThemeAction,
     SetMostRecentProblemAction,
 } from "@/redux/actions";
 
@@ -20,6 +18,11 @@ export interface AppState {
         mostRecent: ProblemTypeDescription;
         types: ProblemTypeDescription[] | null;
     };
+    editor: {
+        config: {
+            theme: "light" | "vs-dark";
+        };
+    };
 }
 
 const initialState: AppState = {
@@ -30,12 +33,18 @@ const initialState: AppState = {
         mostRecent: null as any,
         types: null,
     },
+    editor: {
+        config: {
+            theme: "vs-dark",
+        },
+    },
 };
 
 type AppAction =
-    | ISetAuthUserAction
-    | ISetMostRecentProblemAction
-    | ISetAllProblemTypesAction
+    | ReturnType<typeof SetAuthUserAction.create>
+    | ReturnType<typeof SetMostRecentProblemAction.create>
+    | ReturnType<typeof SetAllProblemTypesAction.create>
+    | ReturnType<typeof SetEditorThemeAction.create>
     | { type: typeof HYDRATE; payload: AppState };
 
 const reducer = (
@@ -81,6 +90,17 @@ const reducer = (
                     types: action.payload,
                 },
             };
+        case SetEditorThemeAction.type:
+            return {
+                ...state,
+                editor: {
+                    ...state.editor,
+                    config: {
+                        ...state.editor.config,
+                        theme: action.payload,
+                    },
+                },
+            };
         default:
             return state;
     }
@@ -90,5 +110,5 @@ const makeStore: MakeStore<Store<AppState>> = (context: Context) =>
     createStore(reducer);
 
 export const wrapper = createWrapper<Store<AppState>>(makeStore, {
-    debug: true,
+    debug: false,
 });

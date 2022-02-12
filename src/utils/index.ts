@@ -1,10 +1,11 @@
-import Axios, { AxiosRequestConfig } from "axios";
+import Axios, { AxiosError, AxiosRequestConfig } from "axios";
 import { serialize as serializeCookie } from "cookie";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 import { Cookie } from "@/constants";
 import { clientAxios } from "@/utils/client-side";
 import { defaultAxiosServerConfig, serverAxios } from "@/utils/server-side";
+import { createErrorRedirectObject } from "@/utils/withErrorHandler";
 
 export const getAxios = (config?: AxiosRequestConfig) => {
     const isServer = typeof window === "undefined";
@@ -36,7 +37,7 @@ export function setCookie(
     );
 }
 
-interface JwtContent {
+interface JwtContent extends JwtPayload {
     id: string;
     jti: string;
     role: string;
@@ -68,13 +69,48 @@ export function getDecodedJwt(
 ): JwtContent | null {
     if (!token) return null;
 
-    try {
-        const data = jwt.decode(token);
+    const [data, error] = runCatching(() => jwt.decode(token));
 
-        if (!data) return null;
+    if (!data || error) return null;
 
-        return data as JwtContent;
-    } catch (error) {
-        return null;
-    }
+    return data as JwtContent;
 }
+
+export type IResult<TResult> =
+    | [result: TResult, error: undefined]
+    | [result: undefined, error: unknown];
+
+export const runCatchingAsync = async <TResult>(
+    func: () => Promise<TResult>
+): Promise<IResult<TResult>> => {
+    try {
+        const result = await func();
+        return [result, undefined];
+    } catch (error) {
+        return [undefined, error];
+    }
+};
+
+export const runCatching = <TResult>(func: () => TResult): IResult<TResult> => {
+    try {
+        const result = func();
+        return [result, undefined];
+    } catch (error) {
+        return [undefined, error];
+    }
+};
+
+export const createAxiosErrorRedirectObject = (error: AxiosError) => {
+    if (error.response) {
+        return createErrorRedirectObject(
+            error.response.status,
+            error.response.statusText
+        );
+    }
+
+    if (error.code) {
+        return createErrorRedirectObject(error.code);
+    }
+
+    return createErrorRedirectObject(500);
+};

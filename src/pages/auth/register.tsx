@@ -9,7 +9,7 @@ import { getIsLoggedIn } from "@/redux/selectors";
 import { wrapper } from "@/redux/store";
 import { getAxios } from "@/utils";
 
-const Login = () => {
+const RegisterPage = () => {
     const [formData, setFormData] = useState<{
         email: string;
         password: string;
@@ -31,7 +31,7 @@ const Login = () => {
     useEffect(() => {
         if (formData) {
             getAxios()
-                .post<{ token: string }>("/auth/login", formData)
+                .post<{ token: string }>("/auth/register", formData)
                 .then(
                     (res) => {
                         window.document.cookie += `access_token=${res.data.token};Max-Age=10000;Path=/`;
@@ -95,7 +95,7 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default RegisterPage;
 
 export const getServerSideProps = wrapper.getServerSideProps(
     (store) =>

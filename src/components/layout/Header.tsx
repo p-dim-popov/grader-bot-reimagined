@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import * as React from "react";
 
 import Hideable from "@/components/Hideable";
@@ -27,9 +28,10 @@ const Divider: React.FC = () => <span>|</span>;
 export default function Header() {
     const isLoggedIn = useAppSelector(getIsLoggedIn);
     const mostRecentProblem = useAppSelector((x) => x.problems.mostRecent);
+    const router = useRouter();
 
     return (
-        <header className="sticky top-0 z-50 w-full bg-white">
+        <header className="sticky top-0 z-50 w-full bg-white shadow-lg">
             <div className="layout flex h-14 items-center justify-between">
                 <UnstyledLink
                     href="/"
@@ -45,18 +47,29 @@ export default function Header() {
                             </div>
                             <ListItemLink
                                 label={mostRecentProblem.displayName}
-                                href={`/problems/${mostRecentProblem.language}/${mostRecentProblem.solutionType}`}
+                                href={`/${mostRecentProblem.language}/${mostRecentProblem.solutionType}/problems`}
                                 description={mostRecentProblem.description}
                             />
                             <Divider />
                         </div>
+                        <ListItemLink
+                            label="Problems"
+                            href="/problems/types"
+                            description="All available problem types"
+                        />
+                        <Divider />
                         <Hideable isVisible={!isLoggedIn}>
                             <ListItemLink
                                 label="Register"
                                 href="/auth/register"
                             />
                             <Divider />
-                            <ListItemLink label="Login" href="/auth/login" />
+                            <ListItemLink
+                                label="Login"
+                                href={`/auth/login?backTo=${encodeURIComponent(
+                                    router.asPath
+                                )}`}
+                            />
                             <Divider />
                         </Hideable>
                         <Hideable isVisible={isLoggedIn}>

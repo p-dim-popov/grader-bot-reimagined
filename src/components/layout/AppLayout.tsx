@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 
 import Header from "@/components/layout/Header";
 
@@ -17,7 +17,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 }
             `}</style>
             <Header />
-            <div className="max-w-1/2 flex h-full w-full flex-col items-center bg-gray-300">
+            <div className="max-w-1/2 flex h-full w-full flex-col items-center bg-white pt-8 md:items-start md:px-14 lg:px-20">
                 {children}
             </div>
         </div>
