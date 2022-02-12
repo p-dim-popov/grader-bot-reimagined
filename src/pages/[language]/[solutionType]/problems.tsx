@@ -1,6 +1,5 @@
 import Axios from "axios";
 import { GetServerSideProps } from "next";
-import { useRouter } from "next/router";
 import React from "react";
 
 import Seo from "@/components/Seo";
@@ -8,15 +7,14 @@ import SimpleLinkCard from "@/components/SimpleLinkCard";
 
 import { Problem } from "@/models/Problem";
 import { fetchAllProblemsOfType } from "@/services/problems.service";
-import { runCatchingAsync } from "@/utils";
+import { createAxiosErrorRedirectObject, runCatchingAsync } from "@/utils";
+import withErrorHandler from "@/utils/withErrorHandler";
 
 interface IProblemsListingPageProps {
     list: Problem[];
 }
 
 const ProblemsListingPage: React.FC<IProblemsListingPageProps> = ({ list }) => {
-    const router = useRouter();
-
     return (
         <>
             <Seo />
@@ -24,7 +22,7 @@ const ProblemsListingPage: React.FC<IProblemsListingPageProps> = ({ list }) => {
                 {list.map((x) => (
                     <SimpleLinkCard
                         key={x.id}
-                        href={`/problems/${router.query.language}/${router.query.solutionType}/${x.id}`}
+                        href={`/problems/${x.id}`}
                         title={x.title}
                         description={x.description}
                         footer={`By: ${x.authorEmail}`}
@@ -34,7 +32,7 @@ const ProblemsListingPage: React.FC<IProblemsListingPageProps> = ({ list }) => {
         </>
     );
 };
-export default ProblemsListingPage;
+export default withErrorHandler(ProblemsListingPage);
 
 export const getServerSideProps: GetServerSideProps<
     IProblemsListingPageProps
@@ -55,12 +53,7 @@ export const getServerSideProps: GetServerSideProps<
     }
 
     if (Axios.isAxiosError(error)) {
-        return {
-            redirect: {
-                destination: "/404",
-            },
-            props: { list: [] },
-        };
+        return createAxiosErrorRedirectObject(error);
     }
 
     return {

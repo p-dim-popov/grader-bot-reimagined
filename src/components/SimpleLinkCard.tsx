@@ -18,7 +18,7 @@ const SimpleLinkCard: React.FC<ISimpleLinkCardProps> = ({
         <Link href={href} passHref>
             <a>
                 <div className="w-full max-w-sm lg:flex lg:max-w-full">
-                    <div className="flex flex-col justify-between rounded-b border-r border-b border-l border-gray-400 bg-white p-4 leading-normal lg:rounded-b-none lg:rounded-r lg:border-l-0 lg:border-t lg:border-gray-400">
+                    <div className="flex flex-col justify-between rounded border border-gray-400 bg-white p-4 leading-normal">
                         <div className="mb-8">
                             <section className="mb-2 text-xl font-bold text-gray-900">
                                 {title}

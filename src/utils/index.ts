@@ -1,10 +1,11 @@
-import Axios, { AxiosRequestConfig } from "axios";
+import Axios, { AxiosError, AxiosRequestConfig } from "axios";
 import { serialize as serializeCookie } from "cookie";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 import { Cookie } from "@/constants";
 import { clientAxios } from "@/utils/client-side";
 import { defaultAxiosServerConfig, serverAxios } from "@/utils/server-side";
+import { createErrorRedirectObject } from "@/utils/withErrorHandler";
 
 export const getAxios = (config?: AxiosRequestConfig) => {
     const isServer = typeof window === "undefined";
@@ -97,4 +98,19 @@ export const runCatching = <TResult>(func: () => TResult): IResult<TResult> => {
     } catch (error) {
         return [undefined, error];
     }
+};
+
+export const createAxiosErrorRedirectObject = (error: AxiosError) => {
+    if (error.response) {
+        return createErrorRedirectObject(
+            error.response.status,
+            error.response.statusText
+        );
+    }
+
+    if (error.code) {
+        return createErrorRedirectObject(error.code);
+    }
+
+    return createErrorRedirectObject(500);
 };

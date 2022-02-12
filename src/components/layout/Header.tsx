@@ -31,7 +31,7 @@ export default function Header() {
     const router = useRouter();
 
     return (
-        <header className="sticky top-0 z-50 w-full bg-white">
+        <header className="sticky top-0 z-50 w-full bg-white shadow-lg">
             <div className="layout flex h-14 items-center justify-between">
                 <UnstyledLink
                     href="/"
@@ -47,7 +47,7 @@ export default function Header() {
                             </div>
                             <ListItemLink
                                 label={mostRecentProblem.displayName}
-                                href={`/problems/${mostRecentProblem.language}/${mostRecentProblem.solutionType}`}
+                                href={`/${mostRecentProblem.language}/${mostRecentProblem.solutionType}/problems`}
                                 description={mostRecentProblem.description}
                             />
                             <Divider />

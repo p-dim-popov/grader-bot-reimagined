@@ -37,7 +37,7 @@ const Login = () => {
                         window.document.cookie += `access_token=${res.data.token};Max-Age=10000;Path=/`;
                         goBackOrHome();
                     },
-                    (e) => console.log(e)
+                    (e) => console.error(e)
                 )
                 .finally(() => setFormData(null));
         }

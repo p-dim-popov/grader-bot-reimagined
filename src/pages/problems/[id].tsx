@@ -18,8 +18,10 @@ import { SolutionAttempt } from "@/models/SolutionAttempt";
 import { useAppSelector } from "@/redux";
 import { SetEditorThemeAction } from "@/redux/actions";
 import { getEditorTheme, getIsLoggedIn } from "@/redux/selectors";
-import { fetchProblemById, submitSolution } from "@/services/problems.service";
-import { runCatchingAsync } from "@/utils";
+import { fetchProblemById } from "@/services/problems.service";
+import { submitSolution } from "@/services/solutions.service";
+import { createAxiosErrorRedirectObject, runCatchingAsync } from "@/utils";
+import withErrorHandler from "@/utils/withErrorHandler";
 
 interface IProblemIdPageProps {
     problem: Problem;
@@ -75,7 +77,7 @@ const ProblemIdPage: React.FC<IProblemIdPageProps> = ({ problem }) => {
     return (
         <>
             <Seo
-                templateTitle={`${problem.title} | ${router.query.language} | ${router.query.solutionType}`}
+                templateTitle={`${problem.title} | ${problem.type.displayName} | ${problem.type.description}`}
                 description={problem.description}
             />
 
@@ -107,10 +109,10 @@ const ProblemIdPage: React.FC<IProblemIdPageProps> = ({ problem }) => {
                     }
                 </div>
                 <CodeEditor
-                    path={`${router.query.id}.${router.query.language}`}
+                    path={`${router.query.id}.${problem.type.language}`}
                     height="50vh"
                     width="100%"
-                    defaultLanguage={router.query.language as string}
+                    defaultLanguage={problem.type.language}
                     theme={editorTheme}
                     onChange={changeHandler}
                     defaultValue={defaultValue}
@@ -203,7 +205,7 @@ const ProblemIdPage: React.FC<IProblemIdPageProps> = ({ problem }) => {
     );
 };
 
-export default ProblemIdPage;
+export default withErrorHandler(ProblemIdPage);
 
 export const getServerSideProps: GetServerSideProps<
     IProblemIdPageProps
@@ -220,14 +222,7 @@ export const getServerSideProps: GetServerSideProps<
     }
 
     if (Axios.isAxiosError(error)) {
-        return {
-            redirect: {
-                destination: "/404",
-            },
-            props: {
-                problem: {} as any,
-            },
-        };
+        return createAxiosErrorRedirectObject(error);
     }
 
     return {

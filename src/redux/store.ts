@@ -110,5 +110,5 @@ const makeStore: MakeStore<Store<AppState>> = (context: Context) =>
     createStore(reducer);
 
 export const wrapper = createWrapper<Store<AppState>>(makeStore, {
-    debug: true,
+    debug: false,
 });

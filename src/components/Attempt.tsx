@@ -9,7 +9,7 @@ import { SolutionAttempt } from "@/models/SolutionAttempt";
 import { useAppSelector } from "@/redux";
 import { getEditorTheme } from "@/redux/selectors";
 
-const Attempt: React.FC<{ attempt: SolutionAttempt; title: string }> = ({
+const Attempt: React.FC<{ attempt: SolutionAttempt; title?: string }> = ({
     attempt,
     title,
 }) => {
