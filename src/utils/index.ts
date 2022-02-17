@@ -114,3 +114,20 @@ export const createAxiosErrorRedirectObject = (error: AxiosError) => {
 
     return createErrorRedirectObject(500);
 };
+
+export const createAuthRedirectObject = (
+    backTo?: string,
+    query?: URLSearchParams
+) => {
+    const url = "/auth/login";
+    const backUrl = query ? `${backTo}${query.toString()}` : backTo;
+    return {
+        redirect: {
+            destination: backUrl
+                ? `${url}?backTo=${encodeURIComponent(backUrl)}`
+                : url,
+            permanent: false,
+        },
+        props: {},
+    };
+};

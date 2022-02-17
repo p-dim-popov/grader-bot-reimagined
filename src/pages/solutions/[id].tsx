@@ -1,5 +1,4 @@
 import Axios from "axios";
-import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import React from "react";
 
@@ -9,8 +8,14 @@ import UnstyledLink from "@/components/links/UnstyledLink";
 
 import { SolutionResponse } from "@/models/SolutionResponse";
 import { useAppSelector } from "@/redux";
+import { getIsLoggedIn } from "@/redux/selectors";
+import { wrapper } from "@/redux/store";
 import { fetchSolutionById } from "@/services/solutions.service";
-import { createAxiosErrorRedirectObject, runCatchingAsync } from "@/utils";
+import {
+    createAuthRedirectObject,
+    createAxiosErrorRedirectObject,
+    runCatchingAsync,
+} from "@/utils";
 import withErrorHandler from "@/utils/withErrorHandler";
 
 interface IProps {
@@ -54,28 +59,33 @@ const SolutionIdPage: React.FC<IProps> = ({ solution }) => {
 
 export default withErrorHandler(SolutionIdPage);
 
-export const getServerSideProps: GetServerSideProps<
-    React.ComponentPropsWithoutRef<typeof SolutionIdPage>
-> = async (context) => {
-    const [solution, error] = await runCatchingAsync(
-        fetchSolutionById(context.params?.id as string)
-    );
+export const getServerSideProps = wrapper.getServerSideProps<IProps>(
+    (store) => async (context) => {
+        const isLoggedIn = getIsLoggedIn(store.getState());
+        if (!isLoggedIn) {
+            return createAuthRedirectObject(`/solutions/${context.params?.id}`);
+        }
 
-    if (solution) {
+        const [solution, error] = await runCatchingAsync(
+            fetchSolutionById(context.params?.id as string)
+        );
+
+        if (solution) {
+            return {
+                props: {
+                    solution,
+                },
+            };
+        }
+
+        if (Axios.isAxiosError(error)) {
+            return createAxiosErrorRedirectObject(error);
+        }
+
         return {
             props: {
-                solution,
+                solution: {} as any,
             },
         };
     }
-
-    if (Axios.isAxiosError(error)) {
-        return createAxiosErrorRedirectObject(error);
-    }
-
-    return {
-        props: {
-            solution: {} as any,
-        },
-    };
-};
+);

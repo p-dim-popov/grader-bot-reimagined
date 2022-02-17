@@ -1,10 +1,12 @@
 import Link from "next/link";
 import React from "react";
 
+import Hideable from "@/components/Hideable";
+
 interface ISimpleLinkCardProps {
     href: string;
     title: string;
-    description: string;
+    description?: string;
     footer: string;
 }
 
@@ -23,9 +25,11 @@ const SimpleLinkCard: React.FC<ISimpleLinkCardProps> = ({
                             <section className="mb-2 text-xl font-bold text-gray-900">
                                 {title}
                             </section>
-                            <div className="text-base text-gray-700">
-                                {description}
-                            </div>
+                            <Hideable isVisible={description}>
+                                <div className="text-base text-gray-700">
+                                    {description}
+                                </div>
+                            </Hideable>
                         </div>
                         <div className="flex items-center">
                             <div className="text-sm">
