@@ -73,6 +73,12 @@ export default function Header() {
                             <Divider />
                         </Hideable>
                         <Hideable isVisible={isLoggedIn}>
+                            <ListItemLink
+                                label="Solutions"
+                                href="/solutions"
+                                description="All submitted solutions"
+                            />
+                            <Divider />
                             <ListItemLink label="Logout" href="/auth/logout" />
                             <Divider />
                         </Hideable>
