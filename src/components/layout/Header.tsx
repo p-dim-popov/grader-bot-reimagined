@@ -47,7 +47,7 @@ export default function Header() {
                             </div>
                             <ListItemLink
                                 label={mostRecentProblem.displayName}
-                                href={`/${mostRecentProblem.language}/${mostRecentProblem.solutionType}/problems`}
+                                href={`/${mostRecentProblem.programmingLanguage}/${mostRecentProblem.solutionType}/problems`}
                                 description={mostRecentProblem.description}
                             />
                             <Divider />

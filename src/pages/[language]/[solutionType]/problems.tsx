@@ -39,7 +39,7 @@ export const getServerSideProps: GetServerSideProps<
 > = async (context) => {
     const [problems, error] = await runCatchingAsync(
         fetchAllProblemsOfType({
-            language: context.params?.language as string,
+            programmingLanguage: context.params?.language as string,
             solutionType: context.params?.solutionType as string,
         })
     );

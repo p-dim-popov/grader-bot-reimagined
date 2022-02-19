@@ -1,5 +1,5 @@
 import { Pagination } from "@/interfaces";
-import { ProblemTypeDescription } from "@/models/ProblemTypeDescription";
+import { BriefProblemTypeDescription } from "@/models/ProblemTypeDescription";
 import { SolutionAttempt } from "@/models/SolutionAttempt";
 import { SolutionResponse } from "@/models/SolutionResponse";
 import { getAxios } from "@/utils";
@@ -26,7 +26,7 @@ export const fetchSolutionById = (id: string) => async () => {
 
 export const fetchSolutions = (
     init: {
-        problemType?: Pick<ProblemTypeDescription, "language" | "solutionType">;
+        problemType?: BriefProblemTypeDescription;
         pagination?: Pagination;
     } = {}
 ) => ({
@@ -35,11 +35,11 @@ export const fetchSolutions = (
             ...init,
             pagination: { page, pageSize },
         }),
-    withProblemType: (language: string, solutionType: string) =>
+    withProblemType: (programmingLanguage: string, solutionType: string) =>
         fetchSolutions({
             ...init,
             problemType: {
-                language,
+                programmingLanguage,
                 solutionType,
             },
         }),
@@ -49,7 +49,7 @@ export const fetchSolutions = (
         if (init.problemType) {
             params.append(
                 "TypeDescription.ProgrammingLanguage",
-                init.problemType.language
+                init.problemType.programmingLanguage
             );
             params.append(
                 "TypeDescription.SolutionType",

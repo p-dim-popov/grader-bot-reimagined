@@ -1,6 +1,8 @@
 import { Problem } from "@/models/Problem";
-import { ProblemType } from "@/models/ProblemType";
-import { ProblemTypeDescription } from "@/models/ProblemTypeDescription";
+import {
+    BriefProblemTypeDescription,
+    ProblemTypeDescription,
+} from "@/models/ProblemTypeDescription";
 import { getAxios } from "@/utils";
 
 export const fetchMostRecentProblemType = async () => {
@@ -18,10 +20,10 @@ export const fetchAllProblemTypes = async () => {
 };
 
 export const fetchAllProblemsOfType =
-    ({ language, solutionType }: ProblemType) =>
+    ({ programmingLanguage, solutionType }: BriefProblemTypeDescription) =>
     async () => {
         const response = await getAxios().get<Problem[]>(
-            `/${language}/${solutionType}/problems`
+            `/${programmingLanguage}/${solutionType}/problems`
         );
         return response.data;
     };

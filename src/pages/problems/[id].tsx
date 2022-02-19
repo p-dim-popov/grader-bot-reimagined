@@ -109,10 +109,10 @@ const ProblemIdPage: React.FC<IProblemIdPageProps> = ({ problem }) => {
                     }
                 </div>
                 <CodeEditor
-                    path={`${router.query.id}.${problem.type.language}`}
+                    path={`${router.query.id}.${problem.type.programmingLanguage}`}
                     height="50vh"
                     width="100%"
-                    defaultLanguage={problem.type.language}
+                    defaultLanguage={problem.type.programmingLanguage}
                     theme={editorTheme}
                     onChange={changeHandler}
                     defaultValue={defaultValue}

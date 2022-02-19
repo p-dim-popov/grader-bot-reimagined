@@ -18,11 +18,11 @@ const ProblemsListingPage: React.FC = () => {
 
             {list?.map((x) => (
                 <SimpleLinkCard
-                    href={`/${x.language}/${x.solutionType}/problems`}
-                    key={`${x.language}/${x.solutionType}`}
+                    href={`/${x.programmingLanguage}/${x.solutionType}/problems`}
+                    key={`${x.programmingLanguage}/${x.solutionType}`}
                     title={x.displayName}
                     description={x.description}
-                    footer={x.language}
+                    footer={x.programmingLanguage}
                 />
             ))}
         </>

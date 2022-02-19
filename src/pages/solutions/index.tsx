@@ -3,6 +3,7 @@ import React from "react";
 
 import SimpleLinkCard from "@/components/SimpleLinkCard";
 
+import { SolutionListItemResponse } from "@/models/SolutionListItemResponse";
 import { getIsLoggedIn } from "@/redux/selectors";
 import { wrapper } from "@/redux/store";
 import { fetchSolutions } from "@/services/solutions.service";
@@ -14,7 +15,7 @@ import {
 import withErrorHandler from "@/utils/withErrorHandler";
 
 interface IProps {
-    solutions: any[];
+    solutions: SolutionListItemResponse[];
 }
 
 const SolutionsListPage: React.FC<IProps> = ({ solutions }) => {
@@ -24,8 +25,9 @@ const SolutionsListPage: React.FC<IProps> = ({ solutions }) => {
                 <SimpleLinkCard
                     key={x.id}
                     href={`/solutions/${x.id}`}
+                    description={`${x.successPercentage}% solved`}
                     title={x.problemTitle}
-                    footer="TODO"
+                    footer={`${x.problemType.displayName} | ${x.problemType.description}`}
                 />
             ))}
         </>
@@ -43,9 +45,9 @@ export const getServerSideProps = wrapper.getServerSideProps<IProps>(
 
         let query = fetchSolutions();
 
-        if (context.query.language && context.query.solutionType) {
+        if (context.query.programmingLanguage && context.query.solutionType) {
             query = query.withProblemType(
-                context.query.language as string,
+                context.query.programmingLanguage as string,
                 context.query.solutionType as string
             );
         }
