@@ -1,7 +1,9 @@
 import App, { AppProps } from "next/app";
 import React, { useEffect } from "react";
+import { ToastContainer } from "react-toastify";
 
 import "@/styles/globals.css";
+import "react-toastify/dist/ReactToastify.css";
 
 import AppLayout from "@/components/layout/AppLayout";
 
@@ -36,6 +38,7 @@ const WrappedApp = wrapper.withRedux((({ Component, pageProps }) => {
     return (
         <AppLayout>
             <Component {...pageProps} />
+            <ToastContainer />
         </AppLayout>
     );
 }) as React.FC<AppProps<IAppProps>>);

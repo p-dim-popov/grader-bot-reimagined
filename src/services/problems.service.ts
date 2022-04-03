@@ -29,7 +29,18 @@ export const fetchAllProblemsOfType =
     };
 
 export const fetchProblemById = (id: string) => async () => {
-    const response = await getAxios().get(`/problems/${id}`);
+    const response = await getAxios().get<Problem>(`/problems/${id}`);
 
     return response.data;
 };
+
+export const editOrCreateProblem =
+    (problemType: BriefProblemTypeDescription, form: FormData) => async () => {
+        const method = form.has("Id") ? "patch" : "post";
+        const response = await getAxios()[method](
+            `/${problemType.programmingLanguage}/${problemType.solutionType}/problems`,
+            form
+        );
+
+        return response.data;
+    };

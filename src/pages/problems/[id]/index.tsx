@@ -2,6 +2,7 @@ import { Button, Select } from "antd";
 import Axios from "axios";
 import { debounce } from "lodash-es";
 import { GetServerSideProps } from "next";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -17,7 +18,12 @@ import { Problem } from "@/models/Problem";
 import { SolutionAttempt } from "@/models/SolutionAttempt";
 import { useAppSelector } from "@/redux";
 import { SetEditorThemeAction } from "@/redux/actions";
-import { getEditorTheme, getIsLoggedIn } from "@/redux/selectors";
+import {
+    getAuthUser,
+    getEditorTheme,
+    getIsLoggedIn,
+    isAuthUserInOneOfRoles,
+} from "@/redux/selectors";
 import { fetchProblemById } from "@/services/problems.service";
 import { submitSolution } from "@/services/solutions.service";
 import { createAxiosErrorRedirectObject, runCatchingAsync } from "@/utils";
@@ -29,6 +35,12 @@ interface IProblemIdPageProps {
 
 const ProblemIdPage: React.FC<IProblemIdPageProps> = ({ problem }) => {
     const isLoggedIn = useAppSelector(getIsLoggedIn);
+    const isAdmin = useAppSelector(isAuthUserInOneOfRoles("Admin"));
+    const user = useAppSelector(getAuthUser);
+
+    const canEdit =
+        isLoggedIn && (isAdmin || user?.email === problem.authorEmail);
+
     const router = useRouter();
     const [defaultValue, setDefaultValue] = useState("");
     const [saveState, setSaveState] = useState<"initial" | "saving" | "saved">(
@@ -82,7 +94,14 @@ const ProblemIdPage: React.FC<IProblemIdPageProps> = ({ problem }) => {
             />
 
             <div className="flex w-full flex-col space-y-4">
-                <h2>{problem.title}</h2>
+                <div className="flex flex-row space-x-2">
+                    <h2>{problem.title}</h2>
+                    <Hideable isVisible={canEdit}>
+                        <Link href={`/problems/${problem.id}/edit`} passHref>
+                            <Button type="primary">Edit</Button>
+                        </Link>
+                    </Hideable>
+                </div>
                 <p>{problem.description}</p>
                 <div
                     data-component="editor-setting-and-info"
