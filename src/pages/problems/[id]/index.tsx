@@ -26,7 +26,11 @@ import {
 } from "@/redux/selectors";
 import { fetchProblemById } from "@/services/problems.service";
 import { submitSolution } from "@/services/solutions.service";
-import { createAxiosErrorRedirectObject, runCatchingAsync } from "@/utils";
+import {
+    createAxiosErrorRedirectObject,
+    runCatchingAsync,
+    useOverrideCtrlS,
+} from "@/utils";
 import withErrorHandler from "@/utils/withErrorHandler";
 
 interface IProblemIdPageProps {
@@ -78,6 +82,8 @@ const ProblemIdPage: React.FC<IProblemIdPageProps> = ({ problem }) => {
         },
         [debouncedSave]
     );
+
+    useOverrideCtrlS();
 
     const [fragmentedAttempts, setFragmentedAttempts] = useState<
         {
@@ -135,7 +141,22 @@ const ProblemIdPage: React.FC<IProblemIdPageProps> = ({ problem }) => {
                         </Link>
                     </Hideable>
                 </div>
-                <p>{problem.description}</p>
+                <div>
+                    Category:{" "}
+                    <Link
+                        href={`/${problem.type.programmingLanguage}/${problem.type.solutionType}/problems`}
+                    >
+                        <a>
+                            <h4>{problem.type.displayName}</h4>
+                        </a>
+                    </Link>
+                </div>
+                <section>
+                    Problem Description:{" "}
+                    <pre className="rounded-md border p-3">
+                        {problem.description}
+                    </pre>
+                </section>
                 <div
                     data-component="editor-setting-and-info"
                     className="flex h-6 flex-row justify-between"

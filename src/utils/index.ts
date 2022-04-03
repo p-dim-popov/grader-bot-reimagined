@@ -1,6 +1,7 @@
 import Axios, { AxiosError, AxiosRequestConfig } from "axios";
 import { serialize as serializeCookie } from "cookie";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { useEffect } from "react";
 
 import { Cookie } from "@/constants";
 import { clientAxios } from "@/utils/client-side";
@@ -139,4 +140,18 @@ export const downloadFile = (link: string) => {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+};
+
+export const useOverrideCtrlS = <T extends () => any>(cb?: T) => {
+    useEffect(() => {
+        const handler = (e: KeyboardEvent) => {
+            if (e.ctrlKey && e.key === "s") {
+                e.preventDefault();
+                cb?.();
+            }
+        };
+        document.addEventListener("keydown", handler);
+
+        return () => document.removeEventListener("keydown", handler);
+    }, [cb]);
 };
