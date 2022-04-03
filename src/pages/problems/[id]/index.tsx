@@ -5,6 +5,7 @@ import { GetServerSideProps } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useCallback, useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 
@@ -141,21 +142,24 @@ const ProblemIdPage: React.FC<IProblemIdPageProps> = ({ problem }) => {
                         </Link>
                     </Hideable>
                 </div>
-                <div>
-                    Category:{" "}
+                <div className="flex flex-row flex-wrap items-baseline space-x-2">
+                    <div>Category:</div>
                     <Link
                         href={`/${problem.type.programmingLanguage}/${problem.type.solutionType}/problems`}
+                        passHref
                     >
-                        <a>
+                        <Button type="dashed">
                             <h4>{problem.type.displayName}</h4>
-                        </a>
+                        </Button>
                     </Link>
                 </div>
                 <section>
-                    Problem Description:{" "}
-                    <pre className="rounded-md border p-3">
-                        {problem.description}
-                    </pre>
+                    <div className="pb-3 text-2xl font-bold">
+                        Problem Description:
+                    </div>
+                    <div className="rounded-md border p-3">
+                        <ReactMarkdown>{problem.description}</ReactMarkdown>
+                    </div>
                 </section>
                 <div
                     data-component="editor-setting-and-info"

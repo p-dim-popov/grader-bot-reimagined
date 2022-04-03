@@ -133,7 +133,7 @@ export const ProblemForm: React.FC<Props> = (props) => {
                         rules={[{ required: true }]}
                         initialValue={props.problem?.description}
                     >
-                        <Input.TextArea />
+                        <Input.TextArea rows={20} />
                     </Form.Item>
                     <Form.Item
                         label="Solution"
