@@ -81,10 +81,43 @@ const ProblemIdPage: React.FC<IProblemIdPageProps> = ({ problem }) => {
 
     const [fragmentedAttempts, setFragmentedAttempts] = useState<
         {
+            id?: string;
             submissionDate: string;
             attempts: SolutionAttempt[];
         }[]
     >([]);
+
+    const handleSubmit = (type: "try" | "submit") => async () => {
+        const submissionDate = new Date().toLocaleString();
+        const [result, error] = await runCatchingAsync(
+            submitSolution(
+                problem.id,
+                window.localStorage.getItem(localStorageKey) ?? "",
+                type === "submit"
+            )
+        );
+
+        if (result) {
+            setFragmentedAttempts((prev) => [
+                {
+                    id: result.id,
+                    attempts: result.attempts,
+                    submissionDate,
+                },
+                ...prev,
+            ]);
+        }
+
+        if (Axios.isAxiosError(error)) {
+            toast(
+                `Something happened. Error: ${
+                    error.message.length > 100
+                        ? `${error.message.substring(0, 100)}...`
+                        : error.message
+                }`
+            );
+        }
+    };
 
     return (
         <>
@@ -137,48 +170,15 @@ const ProblemIdPage: React.FC<IProblemIdPageProps> = ({ problem }) => {
                     defaultValue={defaultValue}
                 />
                 <div className="flex flex-col space-y-4 lg:flex-row lg:justify-between lg:space-y-0">
-                    <Button
-                        type="primary"
-                        onClick={async () => {
-                            const submissionDate = new Date().toLocaleString();
-                            const [attempts, error] = await runCatchingAsync(
-                                submitSolution(
-                                    problem.id,
-                                    window.localStorage.getItem(
-                                        localStorageKey
-                                    ) ?? "",
-                                    false
-                                )
-                            );
-
-                            if (attempts) {
-                                setFragmentedAttempts((prev) => [
-                                    {
-                                        attempts,
-                                        submissionDate,
-                                    },
-                                    ...prev,
-                                ]);
-                            }
-
-                            if (Axios.isAxiosError(error)) {
-                                toast(
-                                    `Something happened. Error: ${
-                                        error.message.length > 100
-                                            ? `${error.message.substring(
-                                                  0,
-                                                  100
-                                              )}...`
-                                            : error.message
-                                    }`
-                                );
-                            }
-                        }}
-                    >
+                    <Button type="primary" onClick={handleSubmit("try")}>
                         Try
                     </Button>
                     <Hideable isVisible={isLoggedIn}>
-                        <Button type="primary" danger>
+                        <Button
+                            type="primary"
+                            danger
+                            onClick={handleSubmit("submit")}
+                        >
                             Submit
                         </Button>
                     </Hideable>
@@ -188,9 +188,17 @@ const ProblemIdPage: React.FC<IProblemIdPageProps> = ({ problem }) => {
                         <h3 className="pb-10">Attempts</h3>
                         <div className="flex flex-col">
                             {fragmentedAttempts
-                                .map(({ attempts, submissionDate }) => (
+                                .map(({ attempts, submissionDate, id }) => (
                                     <>
-                                        <h4>{submissionDate}</h4>
+                                        <h4>
+                                            {submissionDate}
+                                            <Hideable isVisible={id}>
+                                                {" / "}
+                                                <Link href={`/solutions/${id}`}>
+                                                    {id}
+                                                </Link>
+                                            </Hideable>
+                                        </h4>
                                         {attempts.map((attempt, i) => (
                                             <div
                                                 key={i}

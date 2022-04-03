@@ -131,3 +131,12 @@ export const createAuthRedirectObject = (
         props: {},
     };
 };
+
+export const downloadFile = (link: string) => {
+    const a = document.createElement("a");
+    a.href = link;
+    a.download = link.substring(link.lastIndexOf("/") + 1, link.indexOf("?"));
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+};

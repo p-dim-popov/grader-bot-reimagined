@@ -8,12 +8,12 @@ export const submitSolution =
     (id: string, body: string, shouldSave: boolean) => async () => {
         const fd = new FormData();
         fd.append("source", new Blob([body], { type: "text/plain" }));
-        fd.append("shouldSave", String(shouldSave));
+        fd.append("shouldSaveResult", String(shouldSave));
 
-        const response = await getAxios().post<SolutionAttempt[]>(
-            `/problems/${id}/solutions`,
-            fd
-        );
+        const response = await getAxios().post<{
+            id: string;
+            attempts: SolutionAttempt[];
+        }>(`/problems/${id}/solutions`, fd);
 
         return response.data;
     };

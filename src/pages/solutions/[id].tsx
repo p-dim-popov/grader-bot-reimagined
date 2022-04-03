@@ -1,3 +1,4 @@
+import { Button } from "antd";
 import Axios from "axios";
 import { useRouter } from "next/router";
 import React from "react";
@@ -14,15 +15,17 @@ import { fetchSolutionById } from "@/services/solutions.service";
 import {
     createAuthRedirectObject,
     createAxiosErrorRedirectObject,
+    downloadFile,
     runCatchingAsync,
 } from "@/utils";
 import withErrorHandler from "@/utils/withErrorHandler";
 
 interface IProps {
     solution: SolutionResponse;
+    downloadLink: string;
 }
 
-const SolutionIdPage: React.FC<IProps> = ({ solution }) => {
+const SolutionIdPage: React.FC<IProps> = ({ solution, downloadLink }) => {
     const router = useRouter();
     const authUser = useAppSelector((x) => x.auth.user);
 
@@ -40,12 +43,13 @@ const SolutionIdPage: React.FC<IProps> = ({ solution }) => {
                             authUser.id === solution.problemAuthorId)
                     }
                 >
-                    <a
-                        href={`/api/solutions/${router.query.id}/download`}
-                        className="rounded-full border bg-blue-100 p-4 text-center lg:ml-2"
+                    <Button
+                        type="primary"
+                        className="rounded-full border text-center lg:ml-2"
+                        onClick={() => downloadFile(downloadLink)}
                     >
                         Download Solution
-                    </a>
+                    </Button>
                 </Hideable>
             </div>
             {solution.attempts.map((attempt, i) => (
@@ -66,14 +70,16 @@ export const getServerSideProps = wrapper.getServerSideProps<IProps>(
             return createAuthRedirectObject(`/solutions/${context.params?.id}`);
         }
 
-        const [solution, error] = await runCatchingAsync(
-            fetchSolutionById(context.params?.id as string)
-        );
+        const id = context.params?.id as string;
+        const [solution, error] = await runCatchingAsync(fetchSolutionById(id));
+
+        const jwt = context.req.cookies.access_token as string;
 
         if (solution) {
             return {
                 props: {
                     solution,
+                    downloadLink: `/api/solutions/${id}/download?access_token=${jwt}`,
                 },
             };
         }
