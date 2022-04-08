@@ -210,33 +210,50 @@ const ProblemIdPage: React.FC<IProblemIdPageProps> = ({ problem }) => {
                 </div>
                 <Hideable isVisible={fragmentedAttempts.length}>
                     <div>
-                        <h3 className="pb-10">Attempts</h3>
+                        <h3 className="pb-4 underline">Attempts</h3>
                         <div className="flex flex-col">
                             {fragmentedAttempts
-                                .map(({ attempts, submissionDate, id }) => (
-                                    <>
-                                        <h4>
-                                            {submissionDate}
-                                            <Hideable isVisible={id}>
-                                                {" / "}
-                                                <Link href={`/solutions/${id}`}>
-                                                    {id}
-                                                </Link>
-                                            </Hideable>
-                                        </h4>
-                                        {attempts.map((attempt, i) => (
-                                            <div
-                                                key={i}
-                                                className="flex flex-col space-y-10 pt-10"
-                                            >
-                                                <Attempt
-                                                    attempt={attempt}
-                                                    title={`#${i}`}
-                                                />
-                                            </div>
-                                        ))}
-                                    </>
-                                ))
+                                .map(({ attempts, submissionDate, id }) => {
+                                    const percentageSuccess = Math.round(
+                                        (attempts.filter(
+                                            (x) => !x.correctOutput
+                                        ).length /
+                                            attempts.length) *
+                                            100
+                                    );
+
+                                    return (
+                                        <div
+                                            className="pt-4"
+                                            key={submissionDate}
+                                        >
+                                            <h3>
+                                                {submissionDate} (
+                                                {attempts.length} cases,{" "}
+                                                {percentageSuccess}% Success)
+                                                <Hideable isVisible={id}>
+                                                    {" / "}
+                                                    <Link
+                                                        href={`/solutions/${id}`}
+                                                    >
+                                                        {id}
+                                                    </Link>
+                                                </Hideable>
+                                            </h3>
+                                            {attempts.map((attempt, i) => (
+                                                <div
+                                                    key={i}
+                                                    className="flex flex-col pt-8"
+                                                >
+                                                    <Attempt
+                                                        attempt={attempt}
+                                                        title={`#${i}`}
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    );
+                                })
                                 .reduce(
                                     (prev, cur, i) => (
                                         <>

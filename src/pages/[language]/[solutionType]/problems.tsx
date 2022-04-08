@@ -18,7 +18,7 @@ const ProblemsListingPage: React.FC<IProblemsListingPageProps> = ({ list }) => {
     return (
         <>
             <Seo />
-            <div className="flex flex-row flex-wrap space-x-4">
+            <div className="flex flex-row flex-wrap">
                 {list.map((x) => (
                     <SimpleLinkCard
                         key={x.id}

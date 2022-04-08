@@ -1,11 +1,10 @@
 import { Button } from "antd";
 import Axios from "axios";
-import { useRouter } from "next/router";
+import Link from "next/link";
 import React from "react";
 
 import Attempt from "@/components/Attempt";
 import Hideable from "@/components/Hideable";
-import UnstyledLink from "@/components/links/UnstyledLink";
 
 import { SolutionResponse } from "@/models/SolutionResponse";
 import { useAppSelector } from "@/redux";
@@ -26,16 +25,18 @@ interface IProps {
 }
 
 const SolutionIdPage: React.FC<IProps> = ({ solution, downloadLink }) => {
-    const router = useRouter();
     const authUser = useAppSelector((x) => x.auth.user);
 
     return (
         <>
             <h3>Solution for problem</h3>
-            <div className="flex w-full flex-col lg:flex-row lg:items-center">
-                <UnstyledLink href={`/problems/${solution.problemId}`}>
-                    <h2>{solution.problemTitle}</h2>
-                </UnstyledLink>
+            <div className="flex w-full flex-col pb-4 lg:flex-row lg:items-center">
+                {">"}
+                <Link href={`/problems/${solution.problemId}`} passHref>
+                    <Button type="link">
+                        <h2>{solution.problemTitle}</h2>
+                    </Button>
+                </Link>
                 <Hideable
                     isVisible={
                         authUser?.id &&
@@ -52,8 +53,17 @@ const SolutionIdPage: React.FC<IProps> = ({ solution, downloadLink }) => {
                     </Button>
                 </Hideable>
             </div>
+            <h4>
+                {solution.attempts.length} cases,{" "}
+                {Math.round(
+                    (solution.attempts.filter((x) => !x.correctOutput).length /
+                        solution.attempts.length) *
+                        100
+                )}
+                % Success
+            </h4>
             {solution.attempts.map((attempt, i) => (
-                <div key={i} className="flex w-full flex-col space-y-10 pt-10">
+                <div key={i} className="flex w-full flex-col pt-4">
                     <Attempt attempt={attempt} title={`#${i}`} />
                 </div>
             ))}

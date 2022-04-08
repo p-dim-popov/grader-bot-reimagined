@@ -20,7 +20,7 @@ interface IProps {
 
 const SolutionsListPage: React.FC<IProps> = ({ solutions }) => {
     return (
-        <>
+        <div className="flex flex-row flex-wrap">
             {solutions.map((x) => (
                 <SimpleLinkCard
                     key={x.id}
@@ -30,7 +30,7 @@ const SolutionsListPage: React.FC<IProps> = ({ solutions }) => {
                     footer={`${x.problemType.displayName} | ${x.problemType.description}`}
                 />
             ))}
-        </>
+        </div>
     );
 };
 

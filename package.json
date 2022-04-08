@@ -37,6 +37,7 @@
         "react-markdown": "^8.0.2",
         "react-redux": "^7.2.6",
         "react-toastify": "^8.2.0",
+        "strip-markdown": "^5.0.0",
         "tailwind-merge": "^1.2.0"
     },
     "devDependencies": {

@@ -17,14 +17,16 @@ const Attempt: React.FC<{ attempt: SolutionAttempt; title?: string }> = ({
     const editorTheme = useAppSelector(getEditorTheme);
 
     const heading = (
-        <div className="flex flex-row justify-between">
-            <h3>{title}</h3>
-            <Hideable isVisible={isSuccess}>
-                <SuccessIcon className="w-10" />
-            </Hideable>
-            <Hideable isVisible={!isSuccess}>
-                <ErrorIcon className="w-10" />
-            </Hideable>
+        <div className="flex flex-row items-center">
+            <div className="m-2">
+                <Hideable isVisible={isSuccess}>
+                    <SuccessIcon className="w-10" />
+                </Hideable>
+                <Hideable isVisible={!isSuccess}>
+                    <ErrorIcon className="w-10" />
+                </Hideable>
+            </div>
+            <h4>Test Case: {title} / Left - Actual, Right - Expected</h4>
         </div>
     );
 

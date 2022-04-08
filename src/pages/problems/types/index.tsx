@@ -30,7 +30,7 @@ const ProblemsListingPage: React.FC = () => {
                 </div>
             </Hideable>
 
-            <div className="flex flex-row">
+            <div className="flex flex-row flex-wrap">
                 {list?.map((x) => (
                     <SimpleLinkCard
                         href={`/${x.programmingLanguage}/${x.solutionType}/problems`}
