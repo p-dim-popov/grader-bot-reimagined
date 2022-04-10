@@ -8,7 +8,7 @@ import Hideable from "@/components/Hideable";
 
 import { SolutionResponse } from "@/models/SolutionResponse";
 import { useAppSelector } from "@/redux";
-import { getIsLoggedIn } from "@/redux/selectors";
+import { getIsLoggedIn, isAuthUserInOneOfRoles } from "@/redux/selectors";
 import { wrapper } from "@/redux/store";
 import { fetchSolutionById } from "@/services/solutions.service";
 import {
@@ -26,6 +26,9 @@ interface IProps {
 
 const SolutionIdPage: React.FC<IProps> = ({ solution, downloadLink }) => {
     const authUser = useAppSelector((x) => x.auth.user);
+    const isAdmin = useAppSelector(isAuthUserInOneOfRoles("Admin"));
+    const isCreator = authUser?.id === solution.problemAuthorId;
+    const isOwner = authUser?.id === solution.authorId;
 
     return (
         <>
@@ -37,13 +40,7 @@ const SolutionIdPage: React.FC<IProps> = ({ solution, downloadLink }) => {
                         <h2>{solution.problemTitle}</h2>
                     </Button>
                 </Link>
-                <Hideable
-                    isVisible={
-                        authUser?.id &&
-                        (authUser.id === solution.authorId ||
-                            authUser.id === solution.problemAuthorId)
-                    }
-                >
+                <Hideable isVisible={isOwner || isCreator || isAdmin}>
                     <Button
                         type="primary"
                         className="rounded-full border text-center lg:ml-2"
