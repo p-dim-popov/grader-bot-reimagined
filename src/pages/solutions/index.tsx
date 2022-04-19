@@ -10,6 +10,7 @@ import { fetchSolutions } from "@/services/solutions.service";
 import {
     createAuthRedirectObject,
     createAxiosErrorRedirectObject,
+    getSuccessPercentage,
     runCatchingAsync,
 } from "@/utils";
 import withErrorHandler from "@/utils/withErrorHandler";
@@ -25,7 +26,7 @@ const SolutionsListPage: React.FC<IProps> = ({ solutions }) => {
                 <SimpleLinkCard
                     key={x.id}
                     href={`/solutions/${x.id}`}
-                    description={`${x.successPercentage}% solved`}
+                    description={`${getSuccessPercentage(x.attempts)}% solved`}
                     title={x.problemTitle}
                     footer={`${x.problemType.displayName} | ${x.problemType.description}`}
                 />

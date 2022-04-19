@@ -8,5 +8,4 @@ export interface SolutionListItemResponse {
     problemTitle: string;
     createdOn: string;
     attempts: SolutionAttempt[];
-    successPercentage: number;
 }

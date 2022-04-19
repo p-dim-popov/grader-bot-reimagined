@@ -15,6 +15,7 @@ import {
     createAuthRedirectObject,
     createAxiosErrorRedirectObject,
     downloadFile,
+    getSuccessPercentage,
     runCatchingAsync,
 } from "@/utils";
 import withErrorHandler from "@/utils/withErrorHandler";
@@ -52,12 +53,7 @@ const SolutionIdPage: React.FC<IProps> = ({ solution, downloadLink }) => {
             </div>
             <h4>
                 {solution.attempts.length} cases,{" "}
-                {Math.round(
-                    (solution.attempts.filter((x) => !x.correctOutput).length /
-                        solution.attempts.length) *
-                        100
-                )}
-                % Success
+                {getSuccessPercentage(solution.attempts)}% Success
             </h4>
             {solution.attempts.map((attempt, i) => (
                 <div key={i} className="flex w-full flex-col pt-4">

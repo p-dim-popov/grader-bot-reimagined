@@ -4,6 +4,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { useEffect } from "react";
 
 import { Cookie } from "@/constants";
+import { SolutionAttempt } from "@/models/SolutionAttempt";
 import { clientAxios } from "@/utils/client-side";
 import { defaultAxiosServerConfig, serverAxios } from "@/utils/server-side";
 import { createErrorRedirectObject } from "@/utils/withErrorHandler";
@@ -155,3 +156,9 @@ export const useOverrideCtrlS = <T extends () => any>(cb?: T) => {
         return () => document.removeEventListener("keydown", handler);
     }, [cb]);
 };
+
+export const getSuccessPercentage = (attempts: SolutionAttempt[]) =>
+    Math.round(
+        (attempts.filter((x) => !x.correctOutput).length / attempts.length) *
+            100
+    );

@@ -29,6 +29,7 @@ import { fetchProblemById } from "@/services/problems.service";
 import { submitSolution } from "@/services/solutions.service";
 import {
     createAxiosErrorRedirectObject,
+    getSuccessPercentage,
     runCatchingAsync,
     useOverrideCtrlS,
 } from "@/utils";
@@ -214,13 +215,8 @@ const ProblemIdPage: React.FC<IProblemIdPageProps> = ({ problem }) => {
                         <div className="flex flex-col">
                             {fragmentedAttempts
                                 .map(({ attempts, submissionDate, id }) => {
-                                    const percentageSuccess = Math.round(
-                                        (attempts.filter(
-                                            (x) => !x.correctOutput
-                                        ).length /
-                                            attempts.length) *
-                                            100
-                                    );
+                                    const percentageSuccess =
+                                        getSuccessPercentage(attempts);
 
                                     return (
                                         <div
