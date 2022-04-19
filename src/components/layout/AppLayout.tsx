@@ -19,7 +19,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 }
             `}</style>
             <Header />
-            <div className="max-w-1/2 mx-auto flex h-full w-full flex-col items-center bg-white py-8 md:px-14 lg:px-20">
+            <div className="max-w-1/2 mx-auto flex h-full w-full flex-col items-center bg-white py-8 px-2 md:px-14 lg:px-20">
                 {children}
                 <Footer />
             </div>

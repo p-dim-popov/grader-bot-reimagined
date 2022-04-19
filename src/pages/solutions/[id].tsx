@@ -32,19 +32,21 @@ const SolutionIdPage: React.FC<IProps> = ({ solution, downloadLink }) => {
     const isOwner = authUser?.id === solution.authorId;
 
     return (
-        <>
+        <div className="w-full">
             <h3>Solution for problem</h3>
             <div className="flex w-full flex-col pb-4 lg:flex-row lg:items-center">
-                {">"}
-                <Link href={`/problems/${solution.problemId}`} passHref>
-                    <Button type="link">
-                        <h2>{solution.problemTitle}</h2>
-                    </Button>
-                </Link>
+                <div className="flex h-12 flex-row items-center">
+                    {">"}
+                    <Link href={`/problems/${solution.problemId}`} passHref>
+                        <Button type="link">
+                            <h2>{solution.problemTitle}</h2>
+                        </Button>
+                    </Link>
+                </div>
                 <Hideable isVisible={isOwner || isCreator || isAdmin}>
                     <Button
                         type="primary"
-                        className="rounded-full border text-center lg:ml-2"
+                        className="w-60 rounded-full border text-center lg:ml-2"
                         onClick={() => downloadFile(downloadLink)}
                     >
                         Download Solution
@@ -60,7 +62,7 @@ const SolutionIdPage: React.FC<IProps> = ({ solution, downloadLink }) => {
                     <Attempt attempt={attempt} title={`#${i}`} />
                 </div>
             ))}
-        </>
+        </div>
     );
 };
 
