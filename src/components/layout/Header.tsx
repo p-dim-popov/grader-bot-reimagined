@@ -31,17 +31,17 @@ export default function Header() {
     const router = useRouter();
 
     return (
-        <header className="sticky top-0 z-50 w-full bg-white shadow-lg">
-            <div className="layout flex h-14 items-center justify-between">
+        <header className="sticky top-0 z-50 w-full bg-white px-4 shadow-lg">
+            <div className="flex h-14 items-center justify-between">
                 <UnstyledLink
                     href="/"
                     className="font-bold hover:text-gray-600"
                 >
                     Home
                 </UnstyledLink>
-                <nav>
+                <>
                     <ul className="flex items-center justify-between space-x-2">
-                        <div className="invisible flex flex-row space-x-2 md:visible">
+                        <div className="hidden flex-row space-x-2 lg:flex">
                             <div className="font-bold">
                                 Most recently solved problem:
                             </div>
@@ -83,7 +83,7 @@ export default function Header() {
                             <Divider />
                         </Hideable>
                     </ul>
-                </nav>
+                </>
             </div>
         </header>
     );
