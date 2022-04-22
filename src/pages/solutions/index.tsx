@@ -10,7 +10,11 @@ import { BriefProblemTypeDescription } from "@/models/ProblemTypeDescription";
 import { SolutionListItemResponse } from "@/models/SolutionListItemResponse";
 import { useAppSelector } from "@/redux";
 import { SetAllProblemTypesAction } from "@/redux/actions";
-import { getAuthUser, getProblemTypes } from "@/redux/selectors";
+import {
+    getAuthUser,
+    getProblemTypes,
+    isAuthUserInOneOfRoles,
+} from "@/redux/selectors";
 import { wrapper } from "@/redux/store";
 import {
     fetchAllProblemTypes,
@@ -88,6 +92,10 @@ const SolutionsListPage: React.FC<IProps> = ({ solutions, problems }) => {
         )
     );
 
+    const isAdminOrModerator = useAppSelector(
+        isAuthUserInOneOfRoles("Admin", "Moderator")
+    );
+
     return (
         <>
             <SearchBar
@@ -95,7 +103,7 @@ const SolutionsListPage: React.FC<IProps> = ({ solutions, problems }) => {
                 setState={setFiltersQuery}
                 problems={problems}
                 problemTypes={problemTypes || undefined}
-                showUsers
+                showUsers={isAdminOrModerator}
             />
             <div className="flex flex-row flex-wrap">
                 {solutions.map((x) => (
