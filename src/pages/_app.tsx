@@ -1,5 +1,6 @@
 import App, { AppProps } from "next/app";
 import React, { useEffect } from "react";
+import "@/utils/noop";
 
 import "@/styles/globals.css";
 import "react-toastify/dist/ReactToastify.css";

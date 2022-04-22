@@ -1,6 +1,7 @@
 import Axios, { AxiosError, AxiosRequestConfig } from "axios";
 import { serialize as serializeCookie } from "cookie";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { DefaultOptionType } from "rc-cascader";
 import { useEffect } from "react";
 
 import { Cookie } from "@/constants";
@@ -162,3 +163,14 @@ export const getSuccessPercentage = (attempts: SolutionAttempt[]) =>
         (attempts.filter((x) => !x.correctOutput).length / attempts.length) *
             100
     );
+
+export const cascaderSearchFilter = function (
+    inputValue: string,
+    path: DefaultOptionType[]
+) {
+    return path.some(
+        (option) =>
+            typeof option.label === "string" &&
+            option.label.toLowerCase().indexOf(inputValue.toLowerCase()) > -1
+    );
+};

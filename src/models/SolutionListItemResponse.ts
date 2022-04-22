@@ -8,4 +8,5 @@ export interface SolutionListItemResponse {
     problemTitle: string;
     createdOn: string;
     attempts: SolutionAttempt[];
+    authorEmail: string;
 }

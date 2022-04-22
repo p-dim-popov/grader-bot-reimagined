@@ -28,6 +28,9 @@ export const fetchSolutions = (
     init: {
         problemType?: BriefProblemTypeDescription;
         pagination?: Pagination;
+        authors?: string[];
+        problemAuthors?: string[];
+        problemId?: string;
     } = {}
 ) => ({
     withPagination: (page: number, pageSize = 10) =>
@@ -42,6 +45,21 @@ export const fetchSolutions = (
                 programmingLanguage,
                 solutionType,
             },
+        }),
+    withAuthors: (authors: string[] | string) =>
+        fetchSolutions({
+            ...init,
+            authors: [authors].flat(),
+        }),
+    withProblemAuthors: (problemAuthors: string[]) =>
+        fetchSolutions({
+            ...init,
+            problemAuthors,
+        }),
+    withProblemId: (problemId: string) =>
+        fetchSolutions({
+            ...init,
+            problemId,
         }),
     build: () => {
         const params = new URLSearchParams();
@@ -63,6 +81,16 @@ export const fetchSolutions = (
                 "Pagination.PageSize",
                 init.pagination.pageSize.toString()
             );
+        }
+
+        if (init.authors) {
+            init.authors.forEach((a) =>
+                params.append("Filters.AuthorsEmails", a)
+            );
+        }
+
+        if (init.problemId) {
+            params.set("Filters.ProblemId", init.problemId);
         }
 
         return async () => {

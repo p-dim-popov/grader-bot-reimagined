@@ -19,14 +19,51 @@ export const fetchAllProblemTypes = async () => {
     return response.data;
 };
 
-export const fetchAllProblemsOfType =
-    ({ programmingLanguage, solutionType }: BriefProblemTypeDescription) =>
-    async () => {
-        const response = await getAxios().get<Problem[]>(
-            `/${programmingLanguage}/${solutionType}/problems`
-        );
-        return response.data;
-    };
+export const fetchProblems = (
+    init: {
+        problemType?: BriefProblemTypeDescription;
+        authors?: string[];
+    } = {}
+) => ({
+    withProblemType: (programmingLanguage: string, solutionType: string) =>
+        fetchProblems({
+            ...init,
+            problemType: {
+                programmingLanguage,
+                solutionType,
+            },
+        }),
+    withAuthors: (authors: string[]) =>
+        fetchProblems({
+            ...init,
+            authors,
+        }),
+    build: () => {
+        return async () => {
+            const params = new URLSearchParams();
+
+            if (init.problemType) {
+                params.set(
+                    "ProblemType.ProgrammingLanguage",
+                    init.problemType.programmingLanguage
+                );
+                params.set(
+                    "ProblemType.SolutionType",
+                    init.problemType.solutionType
+                );
+            }
+
+            if (init.authors) {
+                init.authors.forEach((a) => params.append("Authors", a));
+            }
+
+            const response = await getAxios().get<Problem[]>(`/problems`, {
+                params,
+            });
+            return response.data;
+        };
+    },
+});
 
 export const fetchProblemById = (id: string) => async () => {
     const response = await getAxios().get<Problem>(`/problems/${id}`);

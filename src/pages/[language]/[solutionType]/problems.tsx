@@ -6,7 +6,7 @@ import Seo from "@/components/Seo";
 import SimpleLinkCard from "@/components/SimpleLinkCard";
 
 import { Problem } from "@/models/Problem";
-import { fetchAllProblemsOfType } from "@/services/problems.service";
+import { fetchProblems } from "@/services/problems.service";
 import { createAxiosErrorRedirectObject, runCatchingAsync } from "@/utils";
 import withErrorHandler from "@/utils/withErrorHandler";
 
@@ -38,10 +38,12 @@ export const getServerSideProps: GetServerSideProps<
     IProblemsListingPageProps
 > = async (context) => {
     const [problems, error] = await runCatchingAsync(
-        fetchAllProblemsOfType({
-            programmingLanguage: context.params?.language as string,
-            solutionType: context.params?.solutionType as string,
-        })
+        fetchProblems({
+            problemType: {
+                programmingLanguage: context.params?.language as string,
+                solutionType: context.params?.solutionType as string,
+            },
+        }).build()
     );
 
     if (problems) {
