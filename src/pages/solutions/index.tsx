@@ -1,6 +1,6 @@
 import Axios from "axios";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 
 import { QueryState, SearchBar } from "@/components/SearchBar";
 import { SolutionLinkCard } from "@/components/SimpleLinkCard/variations/SolutionLinkCard";
@@ -22,6 +22,7 @@ import {
     createAxiosErrorRedirectObject,
     runCatchingAsync,
 } from "@/utils";
+import { useUpdateQueryString } from "@/utils/useUpdateQueryString";
 import withErrorHandler from "@/utils/withErrorHandler";
 
 interface IProps {
@@ -49,45 +50,43 @@ const SolutionsListPage: React.FC<IProps> = ({ solutions, problems }) => {
         problemId: router.query.problemId as string,
     }));
 
-    useEffect(() => {
-        const url = new URL(window.location.href);
-        const oldQueryString = url.searchParams.toString();
-        const params = new URLSearchParams(url.searchParams);
+    useUpdateQueryString(
+        useCallback(
+            (params) => {
+                if (filtersQuery.problemId)
+                    params.set("problemId", filtersQuery.problemId);
+                else params.delete("problemId");
 
-        if (filtersQuery.problemId)
-            params.set("problemId", filtersQuery.problemId);
-        else params.delete("problemId");
+                if (filtersQuery.problemType) {
+                    params.set(
+                        "programmingLanguage",
+                        filtersQuery.problemType.programmingLanguage
+                    );
+                    params.set(
+                        "solutionType",
+                        filtersQuery.problemType.solutionType
+                    );
+                } else {
+                    params.delete("programmingLanguage");
+                    params.delete("solutionType");
+                }
 
-        if (filtersQuery.problemType) {
-            params.set(
-                "programmingLanguage",
-                filtersQuery.problemType.programmingLanguage
-            );
-            params.set("solutionType", filtersQuery.problemType.solutionType);
-        } else {
-            params.delete("programmingLanguage");
-            params.delete("solutionType");
-        }
+                if (filtersQuery.emails) {
+                    params.delete("authors");
+                    filtersQuery.emails.forEach((e) =>
+                        params.append("authors", e)
+                    );
+                } else params.delete("authors");
 
-        if (filtersQuery.emails) {
-            params.delete("authors");
-            filtersQuery.emails.forEach((e) => params.append("authors", e));
-        } else params.delete("authors");
-
-        const newQueryString = params.toString();
-        if (oldQueryString !== newQueryString) {
-            router.push(
-                oldQueryString
-                    ? url.pathname.replace(oldQueryString, newQueryString)
-                    : `${url.pathname}?${newQueryString}`
-            );
-        }
-    }, [
-        filtersQuery.emails,
-        filtersQuery.problemId,
-        filtersQuery.problemType,
-        router,
-    ]);
+                return params;
+            },
+            [
+                filtersQuery.emails,
+                filtersQuery.problemId,
+                filtersQuery.problemType,
+            ]
+        )
+    );
 
     return (
         <>

@@ -141,6 +141,11 @@ const ProblemIdPage: React.FC<IProblemIdPageProps> = ({ problem }) => {
                         <Link href={`/problems/${problem.id}/edit`} passHref>
                             <Button type="primary">Edit</Button>
                         </Link>
+                        <Button
+                            href={`/solutions?problemId=${problem.id}&authors=.*`}
+                        >
+                            View solutions
+                        </Button>
                     </Hideable>
                 </div>
                 <div className="flex flex-row flex-wrap items-baseline space-x-2">

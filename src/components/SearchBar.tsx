@@ -10,7 +10,7 @@ import {
     BriefProblemTypeDescription,
     ProblemTypeDescription,
 } from "@/models/ProblemTypeDescription";
-import { cascaderSearchFilter } from "@/utils";
+import { cascaderSearchFilter, runCatching } from "@/utils";
 
 export type QueryState = {
     emails?: string[];
@@ -67,6 +67,15 @@ export const SearchBar: React.FC<Props> = ({
             if (result && (forceAdd || result !== value)) {
                 if (isDuplicate) {
                     return !toast("Cannot add duplicate email");
+                }
+
+                const [, regexError] = runCatching(() => new RegExp(result));
+                if (regexError) {
+                    return !toast(
+                        `Pattern is not a valid: ${
+                            (regexError as Error).message
+                        }`
+                    );
                 }
 
                 updateProperty("emails", (prev) => [...(prev || []), result]);
