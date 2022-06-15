@@ -1,8 +1,8 @@
 import Axios, { AxiosRequestConfig } from "axios";
 
 export const defaultAxiosServerConfig: AxiosRequestConfig = {
-    baseURL:
-        process.env.NODE_ENV === "development" ? "http://localhost:5228" : "",
+    // FIX: to be dynamic
+    baseURL: `http://api:80`,
 };
 
 export const serverAxios = Axios.create(defaultAxiosServerConfig);

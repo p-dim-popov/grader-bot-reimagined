@@ -4,13 +4,19 @@ module.exports = {
         dirs: ["src"],
     },
 
+    experimental: {
+        outputStandalone: true,
+    },
+
     async rewrites() {
-        return [
-            {
-                source: "/api/:path*",
-                destination: "http://localhost:5228/:path*",
-            },
-        ];
+        const domain = process.env.NEXTJS_API_HOST || "localhost";
+        const port = process.env.NEXTJS_API_PORT || 5228;
+        const apiRewrite = {
+            source: "/api/:path*",
+            destination: `http://${domain}:${port}/:path*`,
+        };
+
+        return [apiRewrite];
     },
 
     reactStrictMode: true,
